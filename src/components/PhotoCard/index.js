@@ -1,16 +1,25 @@
 import React from 'react'
-import { Img, IgmWrapper, Button } from './styles'
-import { MdFavoriteBorder } from 'react-icons/md'
+import { Article, Img, IgmWrapper, Button } from './styles'
+import { MdFavoriteBorder, MdFavorite } from 'react-icons/md'
+import { useLocalStorage } from '../../hooks/useLocalStorage'
+import { useNearScreen } from '../../hooks/useNearScreen'
 
-const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1452857297128-d9c29adba80b?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60'
-export const PhotoCard = ({ id, liked, src }) => {
+export const PhotoCard = ({ id, likes = 0, src }) => {
+  const [show, element] = useNearScreen()
+  const key = `like-${id}`
+  const [liked, setLiked] = useLocalStorage(key, false)
+
+  const Icon = liked ? MdFavorite : MdFavoriteBorder
+
   return (
-    <article>
-      <a href={`/detail/${id}`}>
+    <Article ref={element}>
+      {show && <><a href={`/?detail=${id}`}>
         <IgmWrapper>
-          <Img src={DEFAULT_IMAGE} />
+          <Img src={src} />
         </IgmWrapper>
       </a>
-      <Button> <MdFavoriteBorder size='32px' />{liked} likes!</Button>
-    </article>)
+        <Button onClick={() => setLiked(!liked)}>
+          <Icon size='32px' />{likes} likes!
+        </Button></>}
+    </Article>)
 }
